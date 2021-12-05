@@ -1,64 +1,32 @@
 ﻿string[] Numbers() => File.ReadAllLines("c:\\AOC\\03.txt").ToArray();
 
-int GammaRate(string[] numbers){
-    string result = "";
-
-    for (int i = 0; i < numbers[0].Length; i++){
-        int zeros = 0;
-        int ones = 0;
-        foreach(var number in numbers){
-            if (number[i] == '0'){
-                zeros++;
-            } else {
-                ones++;
-            }
-        }
-        if(zeros > ones){
-            result += '0';
-        } else {
-            result += '1';
-        }
+char MostCommonAtI(string[] numbers, int i)
+{
+    int ones = 0;
+    foreach(var number in numbers){
+        if (number[i] == '1')
+            ones++;
     }
-    return Convert.ToInt32(result, 2);
+    return ones > numbers.Length / 2 ? '1' : '0';
 }
 
-int EpsilonRate(string[] numbers){
-    string result = "";
+int GammaTimesEpsilon(string[] numbers)
+{
+    string gamma = "";
+    string epsilon = "";
 
     for (int i = 0; i < numbers[0].Length; i++){
-        int zeros = 0;
-        int ones = 0;
-        foreach(var number in numbers){
-            if (number[i] == '0'){
-                zeros++;
-            } else {
-                ones++;
-            }
-        }
-        if(zeros > ones){
-            result += '1';
-        } else {
-            result += '0';
-        }
+        gamma += MostCommonAtI(numbers, i);
+        epsilon += MostCommonAtI(numbers, i) == "1" ? "0" : "1";
     }
-    return Convert.ToInt32(result, 2);
+    return Convert.ToInt32(gamma, 2) * Convert.ToInt32(epsilon, 2);
 }
 
 int OxygenRate(string[] numbers){
     int numLenght = numbers[0].Length;
 
     for (int i = 0; i < numLenght; i++){
-        int zeros = 0;
-        int ones = 0;
-        foreach(var number in numbers){
-            if (number[i] == '0'){
-                zeros++;
-            } else {
-                ones++;
-            }
-        }
-        char bit = ones >= zeros? '1' : '0';
-        numbers = numbers.Where(x => x[i] == bit).ToArray();
+        numbers = numbers.Where(x => x[i] == MostCommonAtI(numbers, i)).ToArray();
         if (numbers.Length == 1){
             return Convert.ToInt32(numbers[0], 2);
         }
@@ -70,16 +38,7 @@ int CO2Rate(string[] numbers){
     int numLenght = numbers[0].Length;
 
     for (int i = 0; i < numLenght; i++){
-        int zeros = 0;
-        int ones = 0;
-        foreach(var number in numbers){
-            if (number[i] == '0'){
-                zeros++;
-            } else {
-                ones++;
-            }
-        }
-        char bit = ones >= zeros ? '0' : '1';
+        char bit = MostCommonAtI(numbers, i) == '1' ? '0' : '1';
         numbers = numbers.Where(x => x[i] == bit).ToArray();
         if (numbers.Length == 1){
             return Convert.ToInt32(numbers[0], 2);
@@ -88,5 +47,5 @@ int CO2Rate(string[] numbers){
     return 0;
 }
 
-Console.WriteLine(GammaRate(Numbers()) * EpsilonRate(Numbers()));
+Console.WriteLine(GammaTimesEpsilon(Numbers()));
 Console.WriteLine(OxygenRate(Numbers()) * CO2Rate(Numbers()));

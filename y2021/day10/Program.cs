@@ -4,7 +4,7 @@ var corruptScores = new Dictionary<char, int>(){[')'] = 3, ['}'] = 57, [']'] = 1
 var missingScores = new Dictionary<char, int>(){[')'] = 1, [']'] = 2, ['}'] = 3, ['>'] = 4};
 
 
-char FindFirstCorrput(string input)
+char FindFirstCorrput(string input, Dictionary<char, char> matching)
 {
     var stack = new Stack<char>();
     foreach(char ch in input)
@@ -31,7 +31,7 @@ char FindFirstCorrput(string input)
 }
 
 
-int CalculateCorruptScore(string corrupts){
+int CalculateCorruptScore(string corrupts, Dictionary<char, int> corruptScores){
     var score = 0;
     foreach(char ch in corrupts)
         score += corruptScores[ch];
@@ -39,7 +39,7 @@ int CalculateCorruptScore(string corrupts){
 }
 
 
-string FindMissing(string input){
+string FindMissing(string input, Dictionary<char, char> matching){
     var stack = new Stack<char>();
     foreach(char ch in input)
     {
@@ -70,27 +70,35 @@ string FindMissing(string input){
 }
 
 
-int CalculateMissingScore(string missing){
+int CalculateMissingScore(string missing, Dictionary<char, int> missingScores){
     var score = 0;
     foreach(char ch in missing)
         score = score * 5 + missingScores[ch];
     return score;
 }
 
-var corrupts = "";
-foreach(var input in inputs)
-    corrupts += FindFirstCorrput(input);
 
-Console.WriteLine($"Part 1: {CalculateCorruptScore(corrupts)}");
-
-var missingScoreList = new List<int>();
-foreach(var input in inputs)
-{
-    var missing = FindMissing(input);
-    if(missing != "")
-        missingScoreList.Add(CalculateMissingScore(FindMissing(input)));
+int GetCorruptScoreForAllStrings(string[] inputs, Dictionary<char, char> matching, Dictionary<char, int> corruptScores){
+    var corrupts = "";
+    foreach(var input in inputs)
+        corrupts += FindFirstCorrput(input, matching);
+    return CalculateCorruptScore(corrupts, corruptScores);
 }
-missingScoreList.Sort();
-var missingScore = missingScoreList[missingScoreList.Count / 2];
 
-Console.WriteLine($"Part 2: {missingScore}");
+
+int GetMissingScoreForAllStrings(String[] inputs, Dictionary<char, char> matching, Dictionary<char, int> missingScores){
+    var missingScoreList = new List<int>();
+    foreach(var input in inputs)
+    {
+        var missing = FindMissing(input, matching);
+        if(missing != "")
+            missingScoreList.Add(CalculateMissingScore(missing, missingScores));
+    }
+    missingScoreList.Sort();
+    var missingScore = missingScoreList[missingScoreList.Count / 2];
+    return missingScore;
+}
+
+
+Console.WriteLine($"Part 1: {GetCorruptScoreForAllStrings(inputs, matching, corruptScores)}");
+Console.WriteLine($"Part 2: {GetMissingScoreForAllStrings(inputs, matching, missingScores)}");
